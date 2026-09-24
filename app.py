@@ -1,5 +1,24 @@
+import json
+import os
+
+ARCHIVO = "equipos.json"
+
+
+def cargar_equipos():
+    if os.path.exists(ARCHIVO):
+        with open(ARCHIVO, "r", encoding="utf-8") as archivo:
+            return json.load(archivo)
+
+    return []
+
+
+def guardar_equipos(equipos):
+    with open(ARCHIVO, "w", encoding="utf-8") as archivo:
+        json.dump(equipos, archivo, indent=4)
+
+
 while True:
-    print("\n--- INVENTARIO TI ---")
+    print("\n--- INVENTARIO TI JSON ---")
     print("1. Agregar equipo")
     print("2. Listar equipos")
     print("3. Buscar equipo")
@@ -8,51 +27,60 @@ while True:
     opcion = input("Selecciona una opción: ")
 
     if opcion == "1":
+
         nombre = input("Nombre del equipo: ")
         serie = input("Número de serie: ")
 
-        with open("equipos.txt", "a") as archivo:
-            archivo.write(f"{nombre} - {serie}\n")
+        equipos = cargar_equipos()
+
+        equipos.append({
+            "nombre": nombre,
+            "serie": serie
+        })
+
+        guardar_equipos(equipos)
 
         print("Equipo agregado correctamente.")
 
     elif opcion == "2":
+
+        equipos = cargar_equipos()
+
         print("\n{:<20} {:<15}".format("EQUIPO", "SERIE"))
         print("-" * 35)
 
-        try:
-            with open("equipos.txt", "r") as archivo:
-                for linea in archivo:
-                    datos = linea.strip().split(" - ")
-
-                    if len(datos) == 2:
-                        nombre, serie = datos
-                        print("{:<20} {:<15}".format(nombre, serie))
-
-        except FileNotFoundError:
-            print("No hay equipos registrados.")
+        for equipo in equipos:
+            print(
+                "{:<20} {:<15}".format(
+                    equipo["nombre"],
+                    equipo["serie"]
+                )
+            )
 
     elif opcion == "3":
+
         serie_buscar = input("Ingresa la serie a buscar: ")
+
+        equipos = cargar_equipos()
 
         encontrado = False
 
-        try:
-            with open("equipos.txt", "r") as archivo:
-                for linea in archivo:
-                    if serie_buscar in linea:
-                        print("\nEquipo encontrado:")
-                        print(linea)
-                        encontrado = True
+        for equipo in equipos:
 
-            if not encontrado:
-                print("No se encontró ningún equipo con esa serie.")
+            if equipo["serie"] == serie_buscar:
 
-        except FileNotFoundError:
-            print("No existe el archivo de equipos.")
+                print("\nEquipo encontrado:")
+                print(f"Nombre: {equipo['nombre']}")
+                print(f"Serie: {equipo['serie']}")
+
+                encontrado = True
+
+        if not encontrado:
+            print("No se encontró esa serie.")
 
     elif opcion == "4":
-        print("Saliendo del sistema...")
+
+        print("Saliendo...")
         break
 
     else:
