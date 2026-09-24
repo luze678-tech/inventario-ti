@@ -5,9 +5,9 @@ A simple Python application to manage IT assets.
 ## Features
 
 - Add devices
+- List devices
 - Search devices by serial number
-- List registered devices
-- Store data in JSON format
+- Store data in JSON
 
 ## Technologies
 
