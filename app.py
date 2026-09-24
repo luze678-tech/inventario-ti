@@ -1,87 +1,96 @@
 import json
 import os
 
-ARCHIVO = "equipos.json"
+FILE_NAME = "devices.json"
 
 
-def cargar_equipos():
-    if os.path.exists(ARCHIVO):
-        with open(ARCHIVO, "r", encoding="utf-8") as archivo:
-            return json.load(archivo)
+def load_devices():
+    if os.path.exists(FILE_NAME):
+        with open(FILE_NAME, "r", encoding="utf-8") as file:
+            return json.load(file)
 
     return []
 
 
-def guardar_equipos(equipos):
-    with open(ARCHIVO, "w", encoding="utf-8") as archivo:
-        json.dump(equipos, archivo, indent=4)
+def save_devices(devices):
+    with open(FILE_NAME, "w", encoding="utf-8") as file:
+        json.dump(devices, file, indent=4)
 
 
 while True:
-    print("\n--- INVENTARIO TI JSON ---")
-    print("1. Agregar equipo")
-    print("2. Listar equipos")
-    print("3. Buscar equipo")
-    print("4. Salir")
+    print("\n--- IT INVENTORY SYSTEM ---")
+    print("1. Add Device")
+    print("2. List Devices")
+    print("3. Search Device")
+    print("4. Exit")
 
-    opcion = input("Selecciona una opción: ")
+    option = input("Select an option: ")
 
-    if opcion == "1":
+    if option == "1":
 
-        nombre = input("Nombre del equipo: ")
-        serie = input("Número de serie: ")
+        device_name = input("Device name: ")
+        serial_number = input("Serial number: ")
 
-        equipos = cargar_equipos()
+        devices = load_devices()
 
-        equipos.append({
-            "nombre": nombre,
-            "serie": serie
+        devices.append({
+            "device_name": device_name,
+            "serial_number": serial_number
         })
 
-        guardar_equipos(equipos)
+        save_devices(devices)
 
-        print("Equipo agregado correctamente.")
+        print("Device added successfully.")
 
-    elif opcion == "2":
+    elif option == "2":
 
-        equipos = cargar_equipos()
+        devices = load_devices()
 
-        print("\n{:<20} {:<15}".format("EQUIPO", "SERIE"))
-        print("-" * 35)
+        print("\n{:<25} {:<20}".format(
+            "DEVICE NAME",
+            "SERIAL NUMBER"
+        ))
+        print("-" * 45)
 
-        for equipo in equipos:
+        for device in devices:
             print(
-                "{:<20} {:<15}".format(
-                    equipo["nombre"],
-                    equipo["serie"]
+                "{:<25} {:<20}".format(
+                    device["device_name"],
+                    device["serial_number"]
                 )
             )
 
-    elif opcion == "3":
+    elif option == "3":
 
-        serie_buscar = input("Ingresa la serie a buscar: ")
+        serial_to_search = input(
+            "Enter serial number: "
+        )
 
-        equipos = cargar_equipos()
+        devices = load_devices()
 
-        encontrado = False
+        device_found = False
 
-        for equipo in equipos:
+        for device in devices:
 
-            if equipo["serie"] == serie_buscar:
+            if device["serial_number"] == serial_to_search:
 
-                print("\nEquipo encontrado:")
-                print(f"Nombre: {equipo['nombre']}")
-                print(f"Serie: {equipo['serie']}")
+                print("\nDevice found:")
+                print(
+                    f"Device: {device['device_name']}"
+                )
+                print(
+                    f"Serial: {device['serial_number']}"
+                )
 
-                encontrado = True
+                device_found = True
 
-        if not encontrado:
-            print("No se encontró esa serie.")
+        if not device_found:
+            print("No device found with that serial number.")
 
-    elif opcion == "4":
+    elif option == "4":
 
-        print("Saliendo...")
+        print("Closing application...")
         break
 
     else:
-        print("Opción inválida.")
+        print("Invalid option.")
