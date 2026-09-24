@@ -1,2 +1,3 @@
 print("Hola Git")
-print("Proyecto Inventario TI")
+print("Inventario TI")
+print("Version 2")
