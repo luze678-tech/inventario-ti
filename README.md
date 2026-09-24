@@ -1,13 +1,21 @@
-# Inventario TI
+# IT Inventory Manager
 
-Mi primer proyecto usando Git y GitHub.
+A simple Python application to manage IT assets.
 
-## Tecnologías
+## Features
+
+- Add devices
+- Search devices by serial number
+- List registered devices
+- Store data in JSON format
+
+## Technologies
 
 - Python
 - Git
 - GitHub
+- JSON
 
-## Autor
+## Author
 
 Marisol Toscano Yepez
