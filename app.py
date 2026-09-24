@@ -28,6 +28,7 @@ while True:
                     if len(datos) == 2:
                         nombre, serie = datos
                         print("{:<20} {:<15}".format(nombre, serie))
+
         except FileNotFoundError:
             print("No hay equipos registrados.")
 
@@ -40,4 +41,19 @@ while True:
             with open("equipos.txt", "r") as archivo:
                 for linea in archivo:
                     if serie_buscar in linea:
-                        print("\nEquipo encontrado
+                        print("\nEquipo encontrado:")
+                        print(linea)
+                        encontrado = True
+
+            if not encontrado:
+                print("No se encontró ningún equipo con esa serie.")
+
+        except FileNotFoundError:
+            print("No existe el archivo de equipos.")
+
+    elif opcion == "4":
+        print("Saliendo del sistema...")
+        break
+
+    else:
+        print("Opción inválida.")
