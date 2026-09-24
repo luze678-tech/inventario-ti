@@ -1,5 +1,3 @@
-equipos = []
-
 while True:
     print("\n--- INVENTARIO TI ---")
     print("1. Agregar equipo")
@@ -16,29 +14,30 @@ while True:
         with open("equipos.txt", "a") as archivo:
             archivo.write(f"{nombre} - {serie}\n")
 
-        print("Equipo agregado.")
+        print("Equipo agregado correctamente.")
 
     elif opcion == "2":
-        with open("equipos.txt", "r") as archivo:
-            print(archivo.read())
+        print("\n{:<20} {:<15}".format("EQUIPO", "SERIE"))
+        print("-" * 35)
+
+        try:
+            with open("equipos.txt", "r") as archivo:
+                for linea in archivo:
+                    datos = linea.strip().split(" - ")
+
+                    if len(datos) == 2:
+                        nombre, serie = datos
+                        print("{:<20} {:<15}".format(nombre, serie))
+        except FileNotFoundError:
+            print("No hay equipos registrados.")
 
     elif opcion == "3":
         serie_buscar = input("Ingresa la serie a buscar: ")
 
         encontrado = False
 
-        with open("equipos.txt", "r") as archivo:
-            for linea in archivo:
-                if serie_buscar in linea:
-                    print("Equipo encontrado:")
-                    print(linea)
-                    encontrado = True
-
-        if not encontrado:
-            print("No se encontró ningún equipo con esa serie.")
-
-    elif opcion == "4":
-        break
-
-    else:
-        print("Opción inválida")
+        try:
+            with open("equipos.txt", "r") as archivo:
+                for linea in archivo:
+                    if serie_buscar in linea:
+                        print("\nEquipo encontrado
