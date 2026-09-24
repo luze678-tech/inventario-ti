@@ -17,80 +17,94 @@ def save_devices(devices):
         json.dump(devices, file, indent=4)
 
 
-while True:
-    print("\n--- IT INVENTORY SYSTEM ---")
-    print("1. Add Device")
-    print("2. List Devices")
-    print("3. Search Device")
-    print("4. Exit")
+def add_device():
+    device_name = input("Device name: ")
+    serial_number = input("Serial number: ")
 
-    option = input("Select an option: ")
+    devices = load_devices()
 
-    if option == "1":
+    devices.append({
+        "device_name": device_name,
+        "serial_number": serial_number
+    })
 
-        device_name = input("Device name: ")
-        serial_number = input("Serial number: ")
+    save_devices(devices)
 
-        devices = load_devices()
+    print("Device added successfully.")
 
-        devices.append({
-            "device_name": device_name,
-            "serial_number": serial_number
-        })
 
-        save_devices(devices)
+def list_devices():
+    devices = load_devices()
 
-        print("Device added successfully.")
+    if not devices:
+        print("No devices registered.")
+        return
 
-    elif option == "2":
+    print("\n{:<25} {:<20}".format(
+        "DEVICE NAME",
+        "SERIAL NUMBER"
+    ))
+    print("-" * 45)
 
-        devices = load_devices()
-
-        print("\n{:<25} {:<20}".format(
-            "DEVICE NAME",
-            "SERIAL NUMBER"
-        ))
-        print("-" * 45)
-
-        for device in devices:
-            print(
-                "{:<25} {:<20}".format(
-                    device["device_name"],
-                    device["serial_number"]
-                )
+    for device in devices:
+        print(
+            "{:<25} {:<20}".format(
+                device["device_name"],
+                device["serial_number"]
             )
-
-    elif option == "3":
-
-        serial_to_search = input(
-            "Enter serial number: "
         )
 
-        devices = load_devices()
 
-        device_found = False
+def search_device():
+    serial_to_search = input(
+        "Enter serial number: "
+    )
 
-        for device in devices:
+    devices = load_devices()
 
-            if device["serial_number"] == serial_to_search:
+    for device in devices:
 
-                print("\nDevice found:")
-                print(
-                    f"Device: {device['device_name']}"
-                )
-                print(
-                    f"Serial: {device['serial_number']}"
-                )
+        if device["serial_number"] == serial_to_search:
 
-                device_found = True
+            print("\nDevice found:")
+            print(
+                f"Device: {device['device_name']}"
+            )
+            print(
+                f"Serial: {device['serial_number']}"
+            )
+            return
 
-        if not device_found:
-            print("No device found with that serial number.")
+    print("No device found with that serial number.")
 
-    elif option == "4":
 
-        print("Closing application...")
-        break
+def main():
 
-    else:
-        print("Invalid option.")
+    while True:
+
+        print("\n--- IT INVENTORY SYSTEM ---")
+        print("1. Add Device")
+        print("2. List Devices")
+        print("3. Search Device")
+        print("4. Exit")
+
+        option = input("Select an option: ")
+
+        if option == "1":
+            add_device()
+
+        elif option == "2":
+            list_devices()
+
+        elif option == "3":
+            search_device()
+
+        elif option == "4":
+            print("Closing application...")
+            break
+
+        else:
+            print("Invalid option.")
+
+
+main()
