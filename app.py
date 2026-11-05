@@ -1,110 +1,101 @@
+from flask import Flask, render_template, send_from_directory, jsonify, request
 import json
 import os
+from dotenv import load_dotenv
 
-FILE_NAME = "devices.json"
+# Cargar variables desde el archivo .env
+load_dotenv()
 
+app = Flask(__name__, static_folder='public', static_url_path='')
 
-def load_devices():
+FILE_NAME = os.getenv("FILE_NAME", "tickets.json")
+
+def load_tickets():
     if os.path.exists(FILE_NAME):
         with open(FILE_NAME, "r", encoding="utf-8") as file:
-            return json.load(file)
-
+            try:
+                return json.load(file)
+            except json.JSONDecodeError:
+                return []
     return []
 
-
-def save_devices(devices):
+def save_tickets(tickets):
     with open(FILE_NAME, "w", encoding="utf-8") as file:
-        json.dump(devices, file, indent=4)
+        json.dump(tickets, file, indent=4)
 
 
-def add_device():
-    device_name = input("Device name: ")
-    serial_number = input("Serial number: ")
-
-    devices = load_devices()
-
-    devices.append({
-        "device_name": device_name,
-        "serial_number": serial_number
-    })
-
-    save_devices(devices)
-
-    print("Device added successfully.")
+# ---------------------------------------------------------
+# RUTAS WEB (FRONTEND)
+# ---------------------------------------------------------
+@app.route('/')
+def home():
+    return send_from_directory('public', 'index.html')
 
 
-def list_devices():
-    devices = load_devices()
+# ---------------------------------------------------------
+# RUTAS DE LA API (BACKEND PARA EL FRONTEND)
+# ---------------------------------------------------------
 
-    if not devices:
-        print("No devices registered.")
-        return
-
-    print("\n{:<25} {:<20}".format(
-        "DEVICE NAME",
-        "SERIAL NUMBER"
-    ))
-    print("-" * 45)
-
-    for device in devices:
-        print(
-            "{:<25} {:<20}".format(
-                device["device_name"],
-                device["serial_number"]
-            )
-        )
+# 1. Listar todos los tickets (GET)
+@app.route('/api/tickets', methods=['GET'])
+def api_list_tickets():
+    tickets = load_tickets()
+    return jsonify(tickets)
 
 
-def search_device():
-    serial_to_search = input(
-        "Enter serial number: "
-    )
+# 2. Crear un nuevo ticket (POST)
+@app.route('/api/tickets', methods=['POST'])
+def api_create_ticket():
+    data = request.get_json()
+    
+    user = data.get("user")
+    serial_number = data.get("serial_number", "").strip()
+    issue = data.get("issue")
+    category = data.get("category", "General")
+    priority = data.get("priority", "Medium")
 
-    devices = load_devices()
+    if not user or not serial_number or not issue:
+        return jsonify({"error": "Faltan campos obligatorios (user, serial_number, issue)"}), 400
 
-    for device in devices:
+    tickets = load_tickets()
+    
+    # Validar número de serie duplicado
+    for ticket in tickets:
+        if ticket.get("serial_number") == serial_number:
+            return jsonify({"error": f"El número de serie '{serial_number}' ya existe."}), 400
 
-        if device["serial_number"] == serial_to_search:
+    ticket_id = len(tickets) + 1
 
-            print("\nDevice found:")
-            print(
-                f"Device: {device['device_name']}"
-            )
-            print(
-                f"Serial: {device['serial_number']}"
-            )
-            return
+    new_ticket = {
+        "id": ticket_id,
+        "serial_number": serial_number,
+        "user": user,
+        "category": category,
+        "issue": issue,
+        "priority": priority,
+        "status": "Open"
+    }
 
-    print("No device found with that serial number.")
+    tickets.append(new_ticket)
+    save_tickets(tickets)
 
-
-def main():
-
-    while True:
-
-        print("\n--- IT INVENTORY SYSTEM ---")
-        print("1. Add Device")
-        print("2. List Devices")
-        print("3. Search Device")
-        print("4. Exit")
-
-        option = input("Select an option: ")
-
-        if option == "1":
-            add_device()
-
-        elif option == "2":
-            list_devices()
-
-        elif option == "3":
-            search_device()
-
-        elif option == "4":
-            print("Closing application...")
-            break
-
-        else:
-            print("Invalid option.")
+    return jsonify(new_ticket), 201
 
 
-main()
+# 3. Cerrar un ticket (PATCH)
+@app.route('/api/tickets/<int:ticket_id>/close', methods=['PATCH'])
+def api_close_ticket(ticket_id):
+    tickets = load_tickets()
+    
+    for ticket in tickets:
+        if ticket["id"] == ticket_id:
+            ticket["status"] = "Closed"
+            save_tickets(tickets)
+            return jsonify({"mensaje": "Ticket cerrado exitosamente", "ticket": ticket})
+
+    return jsonify({"error": "Ticket no encontrado"}), 404
+
+
+if __name__ == "__main__":
+    # Importante escuchar en 0.0.0.0 para que Docker lo exponga correctamente
+    app.run(host="0.0.0.0", port=3000, debug=True)

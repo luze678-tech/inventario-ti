@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Inventario TI</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f4f9; color: #333; }
+        h1 { color: #0056b3; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        input, button { padding: 10px; margin: 5px 0; font-size: 16px; }
+        button { background-color: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #004494; }
+        ul { list-style: none; padding: 0; }
+        li { background: #fff; padding: 10px; margin: 5px 0; border-left: 4px solid #0056b3; }
+    </style>
+</head>
+<body>
+
+    <h1>Gestión de Inventario TI</h1>
+
+    <div class="card">
+        <h3>Registrar Nuevo Artículo</h3>
+        <input type="text" id="nombre" placeholder="Nombre del equipo o componente">
+        <input type="text" id="categoria" placeholder="Categoría (Ej. Monitores, Redes)">
+        <button onclick="registrarItem()">Guardar en Inventario</button>
+    </div>
+
+    <div class="card">
+        <h3>Lista de Inventario Actual</h3>
+        <ul id="lista-inventario">
+            <!-- Aquí se cargarán dinámicamente los items -->
+        </ul>
+    </div>
+
+    <script>
+        // URL de tu API (como corre en Docker y mapeaste el puerto 3000)
+        const API_URL = 'http://localhost:3000/api/items'; // Ajusta la ruta según tus endpoints del backend
+
+        async function cargarInventario() {
+            try {
+                const respuesta = await fetch(API_URL);
+                const items = await respuesta.json();
+                
+                const lista = document.getElementById('lista-inventario');
+                lista.innerHTML = '';
+                
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.nombre} - Categoría: ${item.categoria}`;
+                    lista.appendChild(li);
+                });
+            } catch (error) {
+                console.error('Error al cargar el inventario:', error);
+            }
+        }
+
+        async function registrarItem() {
+            const nombre = document.getElementById('nombre').value;
+            const categoria = document.getElementById('categoria').value;
+
+            if (!nombre || !categoria) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nombre, categoria })
+                });
+
+                document.getElementById('nombre').value = '';
+                document.getElementById('categoria').value = '';
+                cargarInventario(); // Recargar la lista
+            } catch (error) {
+                console.error('Error al guardar:', error);
+            }
+        }
+
+        // Cargar los datos al abrir la página
+        cargarInventario();
+    </script>
+</body>
+</html>

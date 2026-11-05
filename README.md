@@ -1,13 +1,13 @@
-# IT Inventory Manager
+# IT Help Desk Ticket Manager
 
-A simple Python application to manage IT assets.
+Simple ticket management system built with Python.
 
 ## Features
 
-- Add devices
-- List devices
-- Search devices by serial number
-- Store data in JSON
+- Create tickets
+- View tickets
+- Search tickets
+- Close tickets
 
 ## Technologies
 
@@ -15,7 +15,3 @@ A simple Python application to manage IT assets.
 - Git
 - GitHub
 - JSON
-
-## Author
-
-Marisol Toscano Yepez
